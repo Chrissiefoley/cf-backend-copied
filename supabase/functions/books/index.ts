@@ -64,6 +64,26 @@ serve(async (req: Request) => {
       );
     }
 
+    // Handle PUT(UPDATE) request - update whole book
+    if (req.method === "PUT") {
+      const { updateData, book_id } = await req.json();
+      const { data, error } = await supabase
+        .from("books")
+        .update(updateData)
+        .eq("book_id", book_id)
+        .select();
+      if (error) throw error;
+      if (data.length === 0) {
+        return new Response(
+          JSON.stringify({
+            message: "This book cannot be updated as it does not exist",
+          }),
+          { headers }
+        );
+      }
+      return new Response(JSON.stringify(data), { headers });
+    }
+
     // Handle DELETE request - delete book
     if (req.method === "DELETE") {
       const { book_id } = await req.json();
