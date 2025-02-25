@@ -14,7 +14,7 @@ serve(async (req: Request) => {
     // Handle GET request - fetch messages
     if (req.method === "GET") {
       const { data, error } = await supabase
-        .from("messages")
+        .from("ratings")
         .select("*")
         .order("created_at", { ascending: false });
 
@@ -24,8 +24,8 @@ serve(async (req: Request) => {
 
     // Handle POST request - add message
     if (req.method === "POST") {
-      const { message } = await req.json();
-      const { error } = await supabase.from("messages").insert([{ message }]);
+      const { rating } = await req.json();
+      const { error } = await supabase.from("ratings").insert([{ rating }]);
       
       if (error) throw error;
       return new Response(JSON.stringify({ success: true, message: "Message sent!" }), { headers });
