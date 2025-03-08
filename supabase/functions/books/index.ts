@@ -45,6 +45,7 @@ serve(async (req: Request) => {
         book_publishedDate,
         book_genre,
         book_description,
+        book_rating
       } = await req.json();
 
       // Checks for book already existing in the library
@@ -70,6 +71,7 @@ serve(async (req: Request) => {
           book_publishedDate,
           book_genre,
           book_description,
+          book_rating
         },
       ]);
       if (uploadError) throw uploadError;
@@ -162,29 +164,6 @@ serve(async (req: Request) => {
         { headers }
       );
     };
-    // if (req.method === "DELETE") {
-    //   const { book_id } = await req.json();
-    //   const { data: existingBooks, error: getError } = await supabase
-    //     .from("books")
-    //     .select("*")
-    //     .eq("book_id", book_id);
-    //   if (getError) throw getError;
-    //   if (existingBooks.length === 0) {
-    //     return new Response(
-    //       JSON.stringify({
-    //         message: "This book cannot be deleted as it does not exist",
-    //       }),
-    //       { headers }
-    //     );
-    //   }
-
-    //   const { data, error } = await supabase
-    //     .from("books")
-    //     .delete()
-    //     .eq("book_id", book_id);
-    //   if (error) throw error;
-    //   return new Response(JSON.stringify(data), { headers });
-    // }
   
     // Handle unsupported methods
     return new Response(JSON.stringify({ error: "Method not allowed" }), {
