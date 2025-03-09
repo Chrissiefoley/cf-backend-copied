@@ -9,7 +9,7 @@ const supabase = createClient(supabaseUrl, supabaseServiceRoleKey);
 serve(async (req: Request) => {
   const headers = { "Content-Type": "application/json" };
 
-    // Handle GET request - fetch books
+    // Handle GET request - fetch genre
   if (req.method === "GET") {
       try{
       const { data, error } = await supabase
@@ -22,7 +22,7 @@ serve(async (req: Request) => {
     } catch (error) {
       return new Response(
         JSON.Stringify({
-          message: 'Error fetching books from library',
+          message: 'Error fetching genre from library',
           error: error.message,
         }),
         { headers }
