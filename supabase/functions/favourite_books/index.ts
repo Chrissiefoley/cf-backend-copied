@@ -48,9 +48,9 @@ serve(async (req: Request) => {
       );
     }
 
-    // Handle PUT(UPDATE) request - update whole book
+    // Handle PUT(UPDATE) request - update favourites
     if (req.method === "PUT") {
-      const { updateData, book_id } = await req.json();
+      const { updateData, favourites_id } = await req.json();
       const { data, error } = await supabase
         .from("favourite_books")
         .update(updateData)
@@ -70,7 +70,7 @@ serve(async (req: Request) => {
 
     // Handle DELETE request - delete book
     if (req.method === "DELETE") {
-      const { book_id } = await req.json();
+      const { favourites_id } = await req.json();
       const { data, error } = await supabase
         .from("favourite_books")
         .delete()

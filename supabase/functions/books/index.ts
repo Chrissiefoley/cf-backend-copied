@@ -93,7 +93,7 @@ serve(async (req: Request) => {
 
     // Handle PUT(UPDATE) request - update whole book
   if (req.method === "PUT") {
-      try {
+    try {
       const { updateData, book_id } = await req.json();
       const { data, error } = await supabase
         .from("books")
@@ -114,7 +114,7 @@ serve(async (req: Request) => {
       return new Response(JSON.stringify(data), { headers });
       } catch (error) {
       return new Response(
-        JSON.Stringify({
+        JSON.stringify({
           message: 'Error updating book in library',
           error: error.message,
         }),
