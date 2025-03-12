@@ -1,18 +1,18 @@
 import { serve } from "https://deno.land/std@0.181.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
+
 // Initialize Supabase client
 const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
 const supabaseServiceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 const supabase = createClient(supabaseUrl, supabaseServiceRoleKey);
 
 serve(async (req: Request) => {
-  // Simple content-type header is all we need
   const headers = { "Content-Type": "application/json" };
 
-  try {
     // Handle GET request - fetch books
-    if (req.method === "GET") {
+  if (req.method === "GET") {
+      try{
       const { data, error } = await supabase
         .from("books")
         .select("*")
@@ -20,16 +20,33 @@ serve(async (req: Request) => {
 
       if (error) throw error;
       return new Response(JSON.stringify(data), { headers });
+    } catch (error) {
+      return new Response(
+        JSON.Stringify({
+          message: 'Error fetching books from library',
+          error: error.message,
+        }),
+        { headers }
+      );
     }
+  }
 
     // Handle POST request - add book
-    if (req.method === "POST") {
+    //set up book 1 fake object
+    //create mock for database and do a request, then return book1
+    //do get mock call, assert book 1 = specific data
+    // do this for all requests
+    
+
+  if (req.method === "POST") {
+      try {
       const {
         book_title,
         book_author,
         book_publishedDate,
         book_genre,
         book_description,
+        book_rating
       } = await req.json();
 
       // Checks for book already existing in the library
@@ -55,6 +72,7 @@ serve(async (req: Request) => {
           book_publishedDate,
           book_genre,
           book_description,
+          book_rating
         },
       ]);
       if (uploadError) throw uploadError;
@@ -62,17 +80,29 @@ serve(async (req: Request) => {
         JSON.stringify({ success: true, message: "Book added!" }),
         { headers }
       );
+    } catch (error) {
+      return new Response(
+        JSON.Stringify({
+          message: 'Error posting books to library',
+          error: error.message,
+        }),
+        { headers }
+      );
     }
+  }
 
     // Handle PUT(UPDATE) request - update whole book
-    if (req.method === "PUT") {
+  if (req.method === "PUT") {
+    try {
       const { updateData, book_id } = await req.json();
       const { data, error } = await supabase
         .from("books")
         .update(updateData)
         .eq("book_id", book_id)
         .select();
+      
       if (error) throw error;
+
       if (data.length === 0) {
         return new Response(
           JSON.stringify({
@@ -82,16 +112,28 @@ serve(async (req: Request) => {
         );
       }
       return new Response(JSON.stringify(data), { headers });
+      } catch (error) {
+      return new Response(
+        JSON.stringify({
+          message: 'Error updating book in library',
+          error: error.message,
+        }),
+        { headers }
+      );
     }
+  }
 
     // Handle DELETE request - delete book
-    if (req.method === "DELETE") {
+  if (req.method === "DELETE") {
+      try {
       const { book_id } = await req.json();
       const { data: existingBooks, error: getError } = await supabase
         .from("books")
         .select("*")
         .eq("book_id", book_id);
+
       if (getError) throw getError;
+        
       if (existingBooks.length === 0) {
         return new Response(
           JSON.stringify({
@@ -101,25 +143,34 @@ serve(async (req: Request) => {
         );
       }
 
-      const { data, error } = await supabase
+      const { error: deleteError } = await supabase
         .from("books")
         .delete()
         .eq("book_id", book_id);
-      if (error) throw error;
-      return new Response(JSON.stringify(data), { headers });
-    }
-
+      
+      if (deleteError) throw deleteError;
+  
+      return new Response(
+        JSON.stringify({
+          message: "Success - Book deleted from library!",
+        }),
+        { headers }
+      );
+    } catch (error) {
+      return new Response(
+        JSON.stringify({
+          message: 'Error deleting book from library',
+          error: error.message,
+        }),
+        { headers }
+      );
+    };
+  
     // Handle unsupported methods
     return new Response(JSON.stringify({ error: "Method not allowed" }), {
       status: 405,
       headers,
     });
-  } catch (error) {
-    const errorMessage =
-      error instanceof Error ? error.message : "Unknown error";
-    return new Response(JSON.stringify({ error: errorMessage }), {
-      status: 500,
-      headers,
-    });
-  }
+  } 
 });
+
